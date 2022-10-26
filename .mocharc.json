@@ -1,0 +1,11 @@
+{
+    "diff": true,
+    "package": "./package.json",
+    "reporter": "spec",
+    "recursive": true,
+    "timeout": 3000,
+    "require": [
+        "test/helpers.js"
+    ],
+    "ui": "bdd"
+}

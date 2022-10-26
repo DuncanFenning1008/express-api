@@ -1,0 +1,25 @@
+{
+    "extends": "standard",
+    "plugins": [
+        "standard",
+        "mocha"
+    ],
+    "globals": {
+        "expect": true
+    },
+    "parserOptions": {
+        "ecmaVersion": "latest"
+    },
+    "env": {
+        "mocha": true,
+        "es6": true
+    },
+    "rules": {
+        "standard/no-callback-literal": 0,
+        "mocha/no-exclusive-tests": "error",
+        "mocha/no-global-tests": "error",
+        "mocha/no-identical-title": "error",
+        "mocha/no-nested-tests": "error",
+        "mocha/no-sibling-hooks": "error"
+    }
+}
