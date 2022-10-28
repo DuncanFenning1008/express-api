@@ -5,14 +5,19 @@ const auth = {
   },
   params: {
     user: {
-      client_id: process.env.AUTH_USER_ID,
-      client_secret: process.env.AUTH_USER_SECRET,
+      client_id: process.env.AUTH_USER_ID || '',
+      client_secret: process.env.AUTH_USER_SECRET || '',
       audience: 'https://saasio.eu.auth0.com/api/v2/',
       grant_type: 'client_credentials'
     }
   }
 }
 
+const cache = {
+  ttl: parseInt(process.env.CACHE_TTL) || 0
+}
+
 module.exports = {
-  auth
+  auth,
+  cache
 }
