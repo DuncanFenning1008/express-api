@@ -17,12 +17,13 @@ createUser.handleRequest = async (req, res, next, params) => {
     // Add user to cache
     const cache = req.app.get('cache')
     const cacheKey = `user:${newUser.user_id}`
-    cache.set(cacheKey, formattedUser, process.env.CACHE_TTL)
+    cache.set(cacheKey, formattedUser, config.cache.ttl)
 
     return res.status(201).send({ status: 'success', data: newUser.data })
   } catch (error) {
+    // Handle auth0 error
     if (error.response && error.response.data) return next(error.response.data)
-    return next(error)
+    return next({ statusCode: 500, message: error })
   }
 }
 

@@ -8,7 +8,9 @@ getUser.handleRequest = async (req, res, next, params) => {
     const cache = req.app.get('cache')
     const { id } = params
 
-    if (!id) throw new Error('`id` is required to lookup a user')
+    if (!id) {
+      return next({ statusCode: 400, message: 'Missing required param:id to return user' })
+    }
 
     const cacheKey = `user:${id}`
 
@@ -26,18 +28,21 @@ getUser.handleRequest = async (req, res, next, params) => {
     const user = await axios.get(`${config.auth.url.base}/users/${id}`, {
       headers: { authorization: `Bearer ${authResponse.data.access_token}` }
     })
-    if (!user.data) throw new Error(`Failed to find user: ${id}`)
+    if (!user?.data?.user_id) {
+      return next({ statusCode: 404, message: `Failed to find user: ${id}` })
+    }
 
     // Set in cache
-    cache.set(cacheKey, user.data, process.env.CACHE_TTL)
+    cache.set(cacheKey, user.data, config.cache.ttl)
 
     return res.status(200).send({
       status: 'success',
       data: user.data
     })
   } catch (error) {
+    // Handle auth0 error
     if (error.response && error.response.data) return next(error.response.data)
-    return next({ status: 404, message: error })
+    return next({ statusCode: 500, message: error })
   }
 }
 

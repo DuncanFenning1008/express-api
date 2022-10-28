@@ -27,10 +27,12 @@ getUsers.handleRequest = async (req, res, next) => {
         authorization: `Bearer ${authResponse.data.access_token}`
       }
     })
-    if (!users.data || !users.data.length) throw new Error('Failed to find users')
+    if (!users?.data?.length) {
+      return next({ statusCode: 404, message: 'Failed to find users' })
+    }
 
     // Set in cache
-    cache.set(cacheKey, users.data, process.env.CACHE_TTL)
+    cache.set(cacheKey, users.data, config.cache.ttl)
 
     return res.status(200).send({
       status: 'success',
@@ -40,8 +42,9 @@ getUsers.handleRequest = async (req, res, next) => {
       }
     })
   } catch (error) {
+    // Handle auth0 error
     if (error.response && error.response.data) return next(error.response.data)
-    return next(error)
+    return next({ statusCode: 500, message: error })
   }
 }
 

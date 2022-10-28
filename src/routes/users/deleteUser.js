@@ -6,7 +6,9 @@ const deleteUser = module.exports = {}
 deleteUser.handleRequest = async (req, res, next, params) => {
   try {
     const { id } = params
-    if (!id) throw new Error('`id` is required to delete a user')
+    if (!id) {
+      return next({ statusCode: 400, message: 'Missing required param:id to delete user' })
+    }
 
     // Delete in Auth0
     const authResponse = await axios.post(config.auth.url.token, config.auth.params.user)
@@ -24,7 +26,7 @@ deleteUser.handleRequest = async (req, res, next, params) => {
       message: `User ${id} has been successfully deleted`
     })
   } catch (error) {
-    return next('Failed to delete user')
+    return next({ statusCode: 500, message: 'Failed to delete user' })
   }
 }
 

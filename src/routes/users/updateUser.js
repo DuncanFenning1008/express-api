@@ -9,7 +9,9 @@ updateUser.handleRequest = async (req, res, next, params) => {
     const user = updateUser.formatUser(params)
 
     const { id } = params
-    if (!id) throw new Error('`id` is required to update a user')
+    if (!id) {
+      return next({ statusCode: 400, message: 'Missing required param:id to update user' })
+    }
 
     // Update in Auth0
     const authResponse = await axios.post(config.auth.url.token, config.auth.params.user)
@@ -20,7 +22,7 @@ updateUser.handleRequest = async (req, res, next, params) => {
     // Update the cache
     const cache = req.app.get('cache')
     const cacheKey = `user:${id}`
-    cache.set(cacheKey, user, process.env.CACHE_TTL)
+    cache.set(cacheKey, user, config.cache.ttl)
 
     return res.status(200).send({
       status: 'success',
@@ -28,8 +30,9 @@ updateUser.handleRequest = async (req, res, next, params) => {
       data: updatedUser.data
     })
   } catch (error) {
+    // Handle auth0 error
     if (error.response && error.response.data) return next(error.response.data)
-    return next('Failed updating user')
+    return next({ statusCode: 500, message: 'Failed updating user' })
   }
 }
 
